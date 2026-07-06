@@ -1,0 +1,477 @@
+options:
+  parameters:
+    author: popo
+    catch_exceptions: 'True'
+    category: '[GRC Hier Blocks]'
+    cmake_opt: ''
+    comment: ''
+    copyright: ''
+    description: ''
+    gen_cmake: 'On'
+    gen_linking: dynamic
+    generate_options: qt_gui
+    hier_block_src_path: '.:'
+    id: task3_rx
+    max_nouts: '0'
+    output_language: python
+    placement: (0,0)
+    qt_qss_theme: ''
+    realtime_scheduling: ''
+    run: 'True'
+    run_command: '{python} -u {filename}'
+    run_options: prompt
+    sizing_mode: fixed
+    thread_safe_setters: ''
+    title: Not titled yet
+    window_size: (1000,1000)
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [8, 8]
+    rotation: 0
+    state: enabled
+
+blocks:
+- name: freq
+  id: variable
+  parameters:
+    comment: ''
+    value: 915e6
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [272, 16.0]
+    rotation: 0
+    state: enabled
+- name: ppm
+  id: variable
+  parameters:
+    comment: ''
+    value: '0'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [504, 16.0]
+    rotation: 0
+    state: enabled
+- name: rx_gain
+  id: variable
+  parameters:
+    comment: ''
+    value: '40'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [432, 16.0]
+    rotation: 0
+    state: enabled
+- name: samp_rate
+  id: variable
+  parameters:
+    comment: ''
+    value: 2e6
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [184, 12]
+    rotation: 0
+    state: enabled
+- name: sps
+  id: variable
+  parameters:
+    comment: ''
+    value: '16'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [360, 16.0]
+    rotation: 0
+    state: enabled
+- name: udp_out_port
+  id: variable
+  parameters:
+    comment: ''
+    value: '5001'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [472, 88.0]
+    rotation: 0
+    state: enabled
+- name: analog_agc2_xx_0
+  id: analog_agc2_xx
+  parameters:
+    affinity: ''
+    alias: ''
+    attack_rate: 1e-1
+    comment: ''
+    decay_rate: 1e-2
+    gain: '1.0'
+    max_gain: '65536'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    reference: '1.0'
+    type: complex
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [280, 184.0]
+    rotation: 0
+    state: enabled
+- name: digital_gmsk_demod_0
+  id: digital_gmsk_demod
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    freq_error: '0.0'
+    gain_mu: '0.05'
+    log: 'False'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    mu: '0.5'
+    omega_relative_limit: '0.01'
+    samples_per_symbol: sps
+    verbose: 'False'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [448, 184.0]
+    rotation: 0
+    state: enabled
+- name: epy_block_0
+  id: epy_block
+  parameters:
+    _source_code: "import numpy as np\nfrom gnuradio import gr\nfrom collections import\
+      \ deque\n\nclass blk(gr.basic_block):\n    \"\"\"\n    Buffer y resincronizador\
+      \ simple para paquetes MPEG-TS.\n\n    Entrada:\n        Stream de bytes desde\
+      \ Pack K Bits.\n\n    Salida:\n        Stream de bytes hacia UDP Sink.\n\n \
+      \   Funci\xF3n:\n        - Busca paquetes MPEG-TS de 188 bytes.\n        - Acepta\
+      \ solamente paquetes cuyo primer byte sea 0x47.\n        - Acumula una cantidad\
+      \ m\xEDnima antes de entregar.\n        - Introduce retardo, pero mejora la\
+      \ estabilidad de entrega.\n    \"\"\"\n\n    def __init__(self, packet_len=188,\
+      \ preload_packets=30):\n        gr.basic_block.__init__(\n            self,\n\
+      \            name=\"ts_buffer_resync\",\n            in_sig=[np.uint8],\n  \
+      \          out_sig=[np.uint8]\n        )\n\n        self.packet_len = int(packet_len)\n\
+      \        self.preload_packets = int(preload_packets)\n\n        self.rx_buffer\
+      \ = bytearray()\n        self.packet_queue = deque()\n\n        self.started\
+      \ = False\n\n        self.rx_count = 0\n        self.valid_count = 0\n     \
+      \   self.drop_count = 0\n\n        self.set_output_multiple(self.packet_len)\n\
+      \n    def general_work(self, input_items, output_items):\n        inp = input_items[0]\n\
+      \        out = output_items[0]\n\n        # Consumir todos los bytes disponibles\
+      \ de entrada\n        if len(inp) > 0:\n            self.rx_buffer.extend(bytes(inp))\n\
+      \            self.rx_count += len(inp)\n            self.consume(0, len(inp))\n\
+      \n        # Buscar paquetes MPEG-TS alineados por 0x47\n        while len(self.rx_buffer)\
+      \ >= self.packet_len:\n            # Si el primer byte es 0x47, tomamos el paquete\
+      \ completo\n            if self.rx_buffer[0] == 0x47:\n                pkt =\
+      \ bytes(self.rx_buffer[:self.packet_len])\n                del self.rx_buffer[:self.packet_len]\n\
+      \n                self.packet_queue.append(pkt)\n                self.valid_count\
+      \ += 1\n\n            else:\n                # Buscar el pr\xF3ximo posible\
+      \ sync byte 0x47\n                try:\n                    idx = self.rx_buffer.index(0x47,\
+      \ 1)\n                    del self.rx_buffer[:idx]\n                    self.drop_count\
+      \ += idx\n                except ValueError:\n                    # Si no hay\
+      \ 0x47, descartamos casi todo y dejamos cola m\xEDnima\n                   \
+      \ keep = min(len(self.rx_buffer), self.packet_len - 1)\n                   \
+      \ self.drop_count += len(self.rx_buffer) - keep\n                    self.rx_buffer\
+      \ = self.rx_buffer[-keep:]\n                    break\n\n        # Esperar hasta\
+      \ tener un buffer inicial\n        if not self.started:\n            if len(self.packet_queue)\
+      \ >= self.preload_packets:\n                self.started = True\n          \
+      \  else:\n                return 0\n\n        # Entregar paquetes completos\
+      \ de 188 bytes\n        max_packets_out = len(out) // self.packet_len\n    \
+      \    packets_to_send = min(max_packets_out, len(self.packet_queue))\n\n    \
+      \    if packets_to_send == 0:\n            self.started = False\n          \
+      \  return 0\n\n        pos = 0\n        for _ in range(packets_to_send):\n \
+      \           pkt = self.packet_queue.popleft()\n            out[pos:pos + self.packet_len]\
+      \ = np.frombuffer(pkt, dtype=np.uint8)\n            pos += self.packet_len\n\
+      \n        return pos"
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    packet_len: '188'
+    preload_packets: '30'
+  states:
+    _io_cache: "('ts_buffer_resync', 'blk', [('packet_len', '188'), ('preload_packets',\
+      \ '30')], [('0', 'byte', 1)], [('0', 'byte', 1)], '\\n    Buffer y resincronizador\
+      \ simple para paquetes MPEG-TS.\\n\\n    Entrada:\\n        Stream de bytes\
+      \ desde Pack K Bits.\\n\\n    Salida:\\n        Stream de bytes hacia UDP Sink.\\\
+      n\\n    Funci\xF3n:\\n        - Busca paquetes MPEG-TS de 188 bytes.\\n    \
+      \    - Acepta solamente paquetes cuyo primer byte sea 0x47.\\n        - Acumula\
+      \ una cantidad m\xEDnima antes de entregar.\\n        - Introduce retardo, pero\
+      \ mejora la estabilidad de entrega.\\n    ', ['packet_len', 'preload_packets'])"
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [696, 296.0]
+    rotation: 0
+    state: disabled
+- name: epy_block_1
+  id: epy_block
+  parameters:
+    _source_code: "import numpy as np\nfrom gnuradio import gr\n\n\nclass blk(gr.basic_block):\n\
+      \    \"\"\"\n    Sincronizador MPEG-TS robusto por bits.\n\n    Entrada:\n \
+      \       Bits uint8 desde GMSK Demod.\n\n    Salida:\n        Bytes uint8 alineados\
+      \ en paquetes MPEG-TS de 188 bytes.\n    \"\"\"\n\n    def __init__(self,\n\
+      \                 packet_len=188,\n                 sync_byte=0x47,\n      \
+      \           lock_window=9,\n                 lock_threshold=8,\n           \
+      \      unlock_after=20,\n                 max_buffer_bits=500000,\n        \
+      \         debug=True):\n\n        gr.basic_block.__init__(\n            self,\n\
+      \            name=\"mpegts_bit_sync_robust\",\n            in_sig=[np.uint8],\n\
+      \            out_sig=[np.uint8],\n        )\n\n        self.packet_len = int(packet_len)\n\
+      \        self.sync_byte = int(sync_byte) & 0xFF\n        self.lock_window =\
+      \ int(lock_window)\n        self.lock_threshold = int(lock_threshold)\n    \
+      \    self.unlock_after = int(unlock_after)\n        self.max_buffer_bits = int(max_buffer_bits)\n\
+      \        self.debug = bool(debug)\n\n        self.packet_bits = self.packet_len\
+      \ * 8\n        self.bits = []\n        self.locked = False\n        self.bad_packets\
+      \ = 0\n\n        self.set_output_multiple(self.packet_len)\n\n    def _byte_at(self,\
+      \ bit_pos):\n        if bit_pos + 8 > len(self.bits):\n            return None\n\
+      \n        value = 0\n\n        for b in self.bits[bit_pos:bit_pos + 8]:\n  \
+      \          value = (value << 1) | (int(b) & 1)\n\n        return value & 0xFF\n\
+      \n    def _packet_to_bytes(self, start_bit):\n        pkt = bytearray(self.packet_len)\n\
+      \n        for i in range(self.packet_len):\n            b = self._byte_at(start_bit\
+      \ + i * 8)\n\n            if b is None:\n                return None\n\n   \
+      \         pkt[i] = b\n\n        return bytes(pkt)\n\n    def _find_sync(self):\n\
+      \        required_bits = (self.lock_window - 1) * self.packet_bits + 8\n\n \
+      \       if len(self.bits) < required_bits:\n            return False\n\n   \
+      \     last_start = len(self.bits) - required_bits + 1\n\n        for start in\
+      \ range(last_start):\n\n            if self._byte_at(start) != self.sync_byte:\n\
+      \                continue\n\n            hits = 1\n\n            for k in range(1,\
+      \ self.lock_window):\n                pos = start + k * self.packet_bits\n\n\
+      \                if self._byte_at(pos) == self.sync_byte:\n                \
+      \    hits += 1\n\n            if hits >= self.lock_threshold:\n\n          \
+      \      if start > 0:\n                    del self.bits[:start]\n\n        \
+      \        self.locked = True\n                self.bad_packets = 0\n\n      \
+      \          if self.debug:\n                    print(\n                    \
+      \    f\"[mpegts_bit_sync] LOCK start={start}, \"\n                        f\"\
+      hits={hits}/{self.lock_window}\"\n                    )\n\n                return\
+      \ True\n\n        if len(self.bits) > self.max_buffer_bits:\n            keep\
+      \ = required_bits + self.packet_bits\n            self.bits = self.bits[-keep:]\n\
+      \n        return False\n\n    def general_work(self, input_items, output_items):\n\
+      \        inp = input_items[0]\n        out = output_items[0]\n\n        if len(inp)\
+      \ > 0:\n            self.bits.extend((inp & 1).astype(np.uint8).tolist())\n\n\
+      \        self.consume(0, len(inp))\n\n        produced = 0\n\n        if not\
+      \ self.locked:\n            self._find_sync()\n            return 0\n\n    \
+      \    while len(self.bits) >= self.packet_bits and produced + self.packet_len\
+      \ <= len(out):\n\n            sync = self._byte_at(0)\n\n            if sync\
+      \ == self.sync_byte:\n                pkt = self._packet_to_bytes(0)\n\n   \
+      \             if pkt is None:\n                    break\n\n               \
+      \ out[produced:produced + self.packet_len] = np.frombuffer(\n              \
+      \      pkt, dtype=np.uint8\n                )\n\n                produced +=\
+      \ self.packet_len\n\n                del self.bits[:self.packet_bits]\n    \
+      \            self.bad_packets = 0\n\n            else:\n                # Antes\
+      \ de descartar un paquete completo, buscar si el 0x47\n                # est\xE1\
+      \ corrido algunos bits hacia adelante.\n                shift_found = None\n\
+      \n                for shift in range(1, 8):\n                    if self._byte_at(shift)\
+      \ == self.sync_byte:\n                        shift_found = shift\n        \
+      \                break\n\n                if shift_found is not None:\n    \
+      \                if self.debug:\n                        print(\n          \
+      \                  f\"[mpegts_bit_sync] BIT REALIGN shift={shift_found}, \"\n\
+      \                            f\"old_sync=0x{sync:02X}\"\n                  \
+      \      )\n\n                    del self.bits[:shift_found]\n              \
+      \      self.bad_packets = 0\n                    continue\n\n              \
+      \  # Si no hay realineaci\xF3n local posible, reci\xE9n ah\xED se descarta el\
+      \ paquete.\n                self.bad_packets += 1\n\n                if self.debug:\n\
+      \                    print(\n                        f\"[mpegts_bit_sync] BAD\
+      \ packet sync=0x{sync:02X}, \"\n                        f\"bad={self.bad_packets}/{self.unlock_after}\"\
+      \n                    )\n\n                del self.bits[:self.packet_bits]\n\
+      \n                if self.bad_packets >= self.unlock_after:\n              \
+      \      if self.debug:\n                        print(\"[mpegts_bit_sync] LOST\
+      \ LOCK\")\n\n                    self.locked = False\n                    self.bad_packets\
+      \ = 0\n                    self._find_sync()\n\n                    if not self.locked:\n\
+      \                        break\n\n        return produced"
+    affinity: ''
+    alias: ''
+    comment: ''
+    debug: 'True'
+    lock_threshold: '8'
+    lock_window: '9'
+    max_buffer_bits: '500000'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    packet_len: '188'
+    sync_byte: '0x47'
+    unlock_after: '20'
+  states:
+    _io_cache: ('mpegts_bit_sync_robust', 'blk', [('packet_len', '188'), ('sync_byte',
+      '71'), ('lock_window', '9'), ('lock_threshold', '8'), ('unlock_after', '20'),
+      ('max_buffer_bits', '500000'), ('debug', 'True')], [('0', 'byte', 1)], [('0',
+      'byte', 1)], '\n    Sincronizador MPEG-TS robusto por bits.\n\n    Entrada:\n        Bits
+      uint8 desde GMSK Demod.\n\n    Salida:\n        Bytes uint8 alineados en paquetes
+      MPEG-TS de 188 bytes.\n    ', ['debug', 'lock_threshold', 'lock_window', 'max_buffer_bits',
+      'packet_len', 'sync_byte', 'unlock_after'])
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [672, 224.0]
+    rotation: 0
+    state: enabled
+- name: freq_xlating_fir_filter_xxx_0
+  id: freq_xlating_fir_filter_xxx
+  parameters:
+    affinity: ''
+    alias: ''
+    center_freq: '186900'
+    comment: ''
+    decim: '1'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    samp_rate: samp_rate
+    taps: firdes.low_pass(1.0, samp_rate, 300e3, 100e3)
+    type: ccc
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [80, 120.0]
+    rotation: 0
+    state: enabled
+- name: network_udp_sink_0
+  id: network_udp_sink
+  parameters:
+    addr: 127.0.0.1
+    affinity: ''
+    alias: ''
+    comment: ''
+    header: '0'
+    payloadsize: '188'
+    port: udp_out_port
+    send_eof: 'False'
+    type: byte
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [896, 288.0]
+    rotation: 0
+    state: enabled
+- name: qtgui_freq_sink_x_0
+  id: qtgui_freq_sink_x
+  parameters:
+    affinity: ''
+    alias: ''
+    alpha1: '1.0'
+    alpha10: '1.0'
+    alpha2: '1.0'
+    alpha3: '1.0'
+    alpha4: '1.0'
+    alpha5: '1.0'
+    alpha6: '1.0'
+    alpha7: '1.0'
+    alpha8: '1.0'
+    alpha9: '1.0'
+    autoscale: 'False'
+    average: '1.0'
+    axislabels: 'True'
+    bw: samp_rate
+    color1: '"blue"'
+    color10: '"dark blue"'
+    color2: '"red"'
+    color3: '"green"'
+    color4: '"black"'
+    color5: '"cyan"'
+    color6: '"magenta"'
+    color7: '"yellow"'
+    color8: '"dark red"'
+    color9: '"dark green"'
+    comment: ''
+    ctrlpanel: 'False'
+    fc: '0'
+    fftsize: '4096'
+    freqhalf: 'True'
+    grid: 'False'
+    gui_hint: ''
+    label: Relative Gain
+    label1: ''
+    label10: ''''''
+    label2: ''''''
+    label3: ''''''
+    label4: ''''''
+    label5: ''''''
+    label6: ''''''
+    label7: ''''''
+    label8: ''''''
+    label9: ''''''
+    legend: 'True'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    name: '""'
+    nconnections: '1'
+    norm_window: 'False'
+    showports: 'False'
+    tr_chan: '0'
+    tr_level: '0.0'
+    tr_mode: qtgui.TRIG_MODE_FREE
+    tr_tag: '""'
+    type: complex
+    units: dB
+    update_time: '0.10'
+    width1: '1'
+    width10: '1'
+    width2: '1'
+    width3: '1'
+    width4: '1'
+    width5: '1'
+    width6: '1'
+    width7: '1'
+    width8: '1'
+    width9: '1'
+    wintype: window.WIN_BLACKMAN_hARRIS
+    ymax: '10'
+    ymin: '-140'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [224, 472.0]
+    rotation: 0
+    state: enabled
+- name: soapy_rtlsdr_source_0
+  id: soapy_rtlsdr_source
+  parameters:
+    affinity: ''
+    agc: 'False'
+    alias: ''
+    bias: 'False'
+    bufflen: '16384'
+    center_freq: freq
+    comment: "El RTL entrega una se\xF1al compleja de bandabase. \nTrae la se\xF1\
+      al alrededor de \"Centrer freq\" a BB\n\n\nla se\xF1al en por ejemplo 105.4FM\
+      \ se trae hasta la banda base"
+    dev_args: ''
+    freq_correction: ppm
+    gain: rx_gain
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    samp_rate: samp_rate
+    type: fc32
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [40, 272.0]
+    rotation: 0
+    state: enabled
+
+connections:
+- [analog_agc2_xx_0, '0', digital_gmsk_demod_0, '0']
+- [digital_gmsk_demod_0, '0', epy_block_1, '0']
+- [epy_block_0, '0', network_udp_sink_0, '0']
+- [epy_block_1, '0', network_udp_sink_0, '0']
+- [freq_xlating_fir_filter_xxx_0, '0', analog_agc2_xx_0, '0']
+- [soapy_rtlsdr_source_0, '0', freq_xlating_fir_filter_xxx_0, '0']
+- [soapy_rtlsdr_source_0, '0', qtgui_freq_sink_x_0, '0']
+
+metadata:
+  file_format: 1
+  grc_version: 3.10.9.2

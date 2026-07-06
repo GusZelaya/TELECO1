@@ -1,0 +1,484 @@
+options:
+  parameters:
+    author: popo
+    catch_exceptions: 'True'
+    category: '[GRC Hier Blocks]'
+    cmake_opt: ''
+    comment: ''
+    copyright: ''
+    description: ''
+    gen_cmake: 'On'
+    gen_linking: dynamic
+    generate_options: qt_gui
+    hier_block_src_path: '.:'
+    id: Task3
+    max_nouts: '0'
+    output_language: python
+    placement: (0,0)
+    qt_qss_theme: ''
+    realtime_scheduling: ''
+    run: 'True'
+    run_command: '{python} -u {filename}'
+    run_options: prompt
+    sizing_mode: fixed
+    thread_safe_setters: ''
+    title: Not titled yet
+    window_size: (1000,1000)
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [8, 8]
+    rotation: 0
+    state: enabled
+
+blocks:
+- name: bt
+  id: variable
+  parameters:
+    comment: ''
+    value: '0.35'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [432, 8.0]
+    rotation: 0
+    state: enabled
+- name: freq
+  id: variable
+  parameters:
+    comment: ''
+    value: 915e6
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [280, 8.0]
+    rotation: 0
+    state: enabled
+- name: samp_rate
+  id: variable
+  parameters:
+    comment: ''
+    value: 2e6
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [184, 12]
+    rotation: 0
+    state: enabled
+- name: sps
+  id: variable
+  parameters:
+    comment: ''
+    value: '16'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [360, 8.0]
+    rotation: 0
+    state: enabled
+- name: tx_amp
+  id: variable
+  parameters:
+    comment: ''
+    value: '0.20'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [512, 8.0]
+    rotation: 0
+    state: enabled
+- name: tx_vga
+  id: variable
+  parameters:
+    comment: ''
+    value: '20'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [512, 80.0]
+    rotation: 0
+    state: enabled
+- name: udp_port
+  id: variable
+  parameters:
+    comment: ''
+    value: '5000'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [424, 80.0]
+    rotation: 0
+    state: enabled
+- name: analog_sig_source_x_0
+  id: analog_sig_source_x
+  parameters:
+    affinity: ''
+    alias: ''
+    amp: '1'
+    comment: ''
+    freq: 200e3
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    offset: '0'
+    phase: '0'
+    samp_rate: samp_rate
+    showports: 'False'
+    type: complex
+    waveform: analog.GR_COS_WAVE
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [16, 144.0]
+    rotation: 0
+    state: enabled
+- name: blocks_multiply_const_vxx_0
+  id: blocks_multiply_const_vxx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    const: '1'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    type: complex
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [384, 176.0]
+    rotation: 0
+    state: enabled
+- name: blocks_multiply_xx_0
+  id: blocks_multiply_xx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    num_inputs: '2'
+    type: complex
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [272, 144.0]
+    rotation: 0
+    state: enabled
+- name: blocks_repeat_0
+  id: blocks_repeat
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    interp: '3'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    type: byte
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [232, 368.0]
+    rotation: 0
+    state: disabled
+- name: blocks_unpack_k_bits_bb_0_0
+  id: blocks_unpack_k_bits_bb
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    k: '8'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [208, 248.0]
+    rotation: 0
+    state: enabled
+- name: blocks_vector_source_x_0
+  id: blocks_vector_source_x
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    repeat: 'True'
+    tags: '[]'
+    type: byte
+    vector: '[0x47] + [0x00]*187'
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [24, 304.0]
+    rotation: 0
+    state: disabled
+- name: digital_gmsk_mod_0
+  id: digital_gmsk_mod
+  parameters:
+    affinity: ''
+    alias: ''
+    bt: bt
+    comment: ''
+    do_unpack: 'False'
+    log: 'False'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    samples_per_symbol: sps
+    verbose: 'False'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [424, 272.0]
+    rotation: 0
+    state: enabled
+- name: epy_block_0
+  id: epy_block
+  parameters:
+    _source_code: "import socket\nimport time\nfrom collections import deque\n\nimport\
+      \ numpy as np\nfrom gnuradio import gr\n\n\nclass blk(gr.sync_block):\n    \"\
+      \"\"\n    Fuente MPEG-TS continua para GNU Radio.\n\n    - Escucha paquetes\
+      \ MPEG-TS por UDP.\n    - Reordena a paquetes de 188 bytes.\n    - Si no hay\
+      \ video disponible, emite paquetes nulos MPEG-TS.\n    - Evita que el modulador\
+      \ GMSK se quede sin datos.\n    \"\"\"\n\n    def __init__(self, in_port=4999,\
+      \ packet_len=188,\n                 max_queue_packets=500, debug=False):\n\n\
+      \        gr.sync_block.__init__(\n            self,\n            name=\"mpegts_udp_pacer_source\"\
+      ,\n            in_sig=[],\n            out_sig=[np.uint8],\n        )\n\n  \
+      \      self.in_port = int(in_port)\n        self.packet_len = int(packet_len)\n\
+      \        self.max_queue_packets = int(max_queue_packets)\n        self.debug\
+      \ = bool(debug)\n\n        # Generador pseudoaleatorio para el payload de paquetes\
+      \ nulos.\n        self.lfsr = 0xACE1\n\n        self.queue = deque()\n     \
+      \   self.rxbuf = bytearray()\n\n        self.sent_video = 0\n        self.sent_null\
+      \ = 0\n        self.dropped = 0\n        self.last_print = time.monotonic()\n\
+      \n        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)\n   \
+      \     self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)\n\n  \
+      \      try:\n            self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF,\
+      \ 2 * 1024 * 1024)\n        except Exception:\n            pass\n\n        self.sock.bind((\"\
+      127.0.0.1\", self.in_port))\n        self.sock.setblocking(False)\n\n      \
+      \  self.set_output_multiple(self.packet_len)\n\n        if self.debug:\n   \
+      \         print(f\"[mpegts_udp_pacer_source] Escuchando UDP {self.in_port}\"\
+      )\n\n    def _pn_byte(self):\n        \"\"\"\n        Genera un byte pseudoaleatorio\
+      \ mediante LFSR de 16 bits.\n        Se usa solamente para rellenar el payload\
+      \ de paquetes nulos MPEG-TS.\n        \"\"\"\n\n        out = 0\n\n        for\
+      \ _ in range(8):\n            newbit = (\n                ((self.lfsr >> 0)\
+      \ ^\n                 (self.lfsr >> 2) ^\n                 (self.lfsr >> 3)\
+      \ ^\n                 (self.lfsr >> 5)) & 1\n            )\n\n            self.lfsr\
+      \ = ((self.lfsr >> 1) | (newbit << 15)) & 0xFFFF\n            out = (out <<\
+      \ 1) | (self.lfsr & 1)\n\n        return out & 0xFF\n\n    def _make_null_packet(self):\n\
+      \        \"\"\"\n        Genera un paquete nulo MPEG-TS v\xE1lido.\n\n     \
+      \   Header:\n            0x47       sync byte\n            0x1F 0xFF  PID =\
+      \ 0x1FFF, paquete nulo\n            0x10       payload only\n        \"\"\"\n\
+      \n        payload = bytes(self._pn_byte() for _ in range(self.packet_len - 4))\n\
+      \        return bytes([0x47, 0x1F, 0xFF, 0x10]) + payload\n\n    def _drain_udp(self):\n\
+      \        \"\"\"\n        Lee todos los datagramas UDP disponibles sin bloquear.\n\
+      \        Extrae paquetes MPEG-TS de 188 bytes alineados con 0x47.\n        \"\
+      \"\"\n\n        for _ in range(100):\n            try:\n                data,\
+      \ _addr = self.sock.recvfrom(65536)\n            except BlockingIOError:\n \
+      \               break\n\n            if not data:\n                break\n\n\
+      \            self.rxbuf.extend(data)\n\n            while len(self.rxbuf) >=\
+      \ self.packet_len:\n\n                if self.rxbuf[0] != 0x47:\n          \
+      \          pos = self.rxbuf.find(b\"\\x47\")\n\n                    if pos <\
+      \ 0:\n                        self.rxbuf.clear()\n                        break\n\
+      \n                    del self.rxbuf[:pos]\n\n                if len(self.rxbuf)\
+      \ < self.packet_len:\n                    break\n\n                pkt = bytes(self.rxbuf[:self.packet_len])\n\
+      \                del self.rxbuf[:self.packet_len]\n\n                if pkt[0]\
+      \ == 0x47:\n                    self.queue.append(pkt)\n\n                 \
+      \   if len(self.queue) > self.max_queue_packets:\n                        self.queue.popleft()\n\
+      \                        self.dropped += 1\n\n    def work(self, input_items,\
+      \ output_items):\n        out = output_items[0]\n\n        self._drain_udp()\n\
+      \n        n_packets = len(out) // self.packet_len\n\n        if n_packets <=\
+      \ 0:\n            return 0\n\n        produced = 0\n\n        for _ in range(n_packets):\n\
+      \n            if self.queue:\n                pkt = self.queue.popleft()\n \
+      \               self.sent_video += 1\n            else:\n                pkt\
+      \ = self._make_null_packet()\n                self.sent_null += 1\n\n      \
+      \      out[produced:produced + self.packet_len] = np.frombuffer(\n         \
+      \       pkt, dtype=np.uint8\n            )\n\n            produced += self.packet_len\n\
+      \n        if self.debug:\n            now = time.monotonic()\n\n           \
+      \ if now - self.last_print >= 1.0:\n                print(\n               \
+      \     f\"[mpegts_udp_pacer_source] queue={len(self.queue):4d} \"\n         \
+      \           f\"video={self.sent_video:5d} \"\n                    f\"null={self.sent_null:5d}\
+      \ \"\n                    f\"dropped={self.dropped:4d}\"\n                )\n\
+      \n                self.sent_video = 0\n                self.sent_null = 0\n\
+      \                self.dropped = 0\n                self.last_print = now\n\n\
+      \        return produced"
+    affinity: ''
+    alias: ''
+    comment: ''
+    debug: 'True'
+    in_port: '4999'
+    max_queue_packets: '500'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    packet_len: '188'
+  states:
+    _io_cache: ('mpegts_udp_pacer_source', 'blk', [('in_port', '4999'), ('packet_len',
+      '188'), ('max_queue_packets', '500'), ('debug', 'False')], [], [('0', 'byte',
+      1)], '\n    Fuente MPEG-TS continua para GNU Radio.\n\n    - Escucha paquetes
+      MPEG-TS por UDP.\n    - Reordena a paquetes de 188 bytes.\n    - Si no hay video
+      disponible, emite paquetes nulos MPEG-TS.\n    - Evita que el modulador GMSK
+      se quede sin datos.\n    ', ['debug', 'in_port', 'max_queue_packets', 'packet_len'])
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [16, 384.0]
+    rotation: 0
+    state: enabled
+- name: network_udp_source_0
+  id: network_udp_source
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    header: '0'
+    ipv6: 'False'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    notify_missed: 'False'
+    payloadsize: '188'
+    port: '5000'
+    src_zeros: 'False'
+    type: byte
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [32, 464.0]
+    rotation: 0
+    state: disabled
+- name: qtgui_freq_sink_x_0
+  id: qtgui_freq_sink_x
+  parameters:
+    affinity: ''
+    alias: ''
+    alpha1: '1.0'
+    alpha10: '1.0'
+    alpha2: '1.0'
+    alpha3: '1.0'
+    alpha4: '1.0'
+    alpha5: '1.0'
+    alpha6: '1.0'
+    alpha7: '1.0'
+    alpha8: '1.0'
+    alpha9: '1.0'
+    autoscale: 'False'
+    average: '1.0'
+    axislabels: 'True'
+    bw: samp_rate
+    color1: '"blue"'
+    color10: '"dark blue"'
+    color2: '"red"'
+    color3: '"green"'
+    color4: '"black"'
+    color5: '"cyan"'
+    color6: '"magenta"'
+    color7: '"yellow"'
+    color8: '"dark red"'
+    color9: '"dark green"'
+    comment: ''
+    ctrlpanel: 'False'
+    fc: '0'
+    fftsize: '4096'
+    freqhalf: 'True'
+    grid: 'False'
+    gui_hint: ''
+    label: Relative Gain
+    label1: ''
+    label10: ''''''
+    label2: ''''''
+    label3: ''''''
+    label4: ''''''
+    label5: ''''''
+    label6: ''''''
+    label7: ''''''
+    label8: ''''''
+    label9: ''''''
+    legend: 'True'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    name: '""'
+    nconnections: '1'
+    norm_window: 'False'
+    showports: 'False'
+    tr_chan: '0'
+    tr_level: '0.0'
+    tr_mode: qtgui.TRIG_MODE_FREE
+    tr_tag: '""'
+    type: complex
+    units: dB
+    update_time: '0.10'
+    width1: '1'
+    width10: '1'
+    width2: '1'
+    width3: '1'
+    width4: '1'
+    width5: '1'
+    width6: '1'
+    width7: '1'
+    width8: '1'
+    width9: '1'
+    wintype: window.WIN_BLACKMAN_hARRIS
+    ymax: '10'
+    ymin: '-140'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [688, 272.0]
+    rotation: 0
+    state: enabled
+- name: soapy_hackrf_sink_0
+  id: soapy_hackrf_sink
+  parameters:
+    affinity: ''
+    alias: ''
+    amp: 'False'
+    bandwidth: 2e6
+    center_freq: freq
+    comment: ''
+    dev_args: ''
+    samp_rate: samp_rate
+    type: fc32
+    vga: tx_vga
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [696, 152.0]
+    rotation: 0
+    state: enabled
+
+connections:
+- [analog_sig_source_x_0, '0', blocks_multiply_xx_0, '0']
+- [blocks_multiply_const_vxx_0, '0', soapy_hackrf_sink_0, '0']
+- [blocks_multiply_xx_0, '0', blocks_multiply_const_vxx_0, '0']
+- [blocks_multiply_xx_0, '0', qtgui_freq_sink_x_0, '0']
+- [blocks_repeat_0, '0', digital_gmsk_mod_0, '0']
+- [blocks_unpack_k_bits_bb_0_0, '0', blocks_repeat_0, '0']
+- [blocks_unpack_k_bits_bb_0_0, '0', digital_gmsk_mod_0, '0']
+- [blocks_vector_source_x_0, '0', blocks_unpack_k_bits_bb_0_0, '0']
+- [digital_gmsk_mod_0, '0', blocks_multiply_xx_0, '1']
+- [epy_block_0, '0', blocks_unpack_k_bits_bb_0_0, '0']
+- [network_udp_source_0, '0', blocks_unpack_k_bits_bb_0_0, '0']
+
+metadata:
+  file_format: 1
+  grc_version: 3.10.9.2
